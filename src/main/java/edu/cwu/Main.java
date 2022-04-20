@@ -1,4 +1,4 @@
-package edu.cwu;
+package main.java.edu.cwu;
 
 public class Main {
 

@@ -12,8 +12,10 @@ val lwjglNatives = "natives-windows"
 
 repositories {
     mavenCentral()
-    maven("https://jitpack.io")
+
 }
+
+
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
@@ -45,10 +47,8 @@ dependencies {
     runtimeOnly("org.lwjgl", "lwjgl-stb", classifier = lwjglNatives)
     implementation("org.joml", "joml", jomlVersion)
 
-    //imgui-kotlin components
-    //implementation("com.github.kotlin-graphics.imgui:core:v1.79") // Core
-    //implementation("com.github.kotlin-graphics.imgui:gl:v1.79") // OpenGL
-    //implementation("com.github.kotlin-graphics.imgui:glfw:v1.79") // GLFW
+    //imgui-java components
+    implementation("io.github.spair:imgui-java-app:1.86.4")
 
 }
 

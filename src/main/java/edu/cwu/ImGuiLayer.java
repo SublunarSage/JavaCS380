@@ -12,7 +12,10 @@ public class ImGuiLayer {
     // ImGui layers always have a beginning and ending, as it's basically functioning in a 'stack' like context
     public void imgui() {
         ImGui.begin("Cool Window", ImGuiWindowFlags.NoMove + ImGuiWindowFlags.NoResize
-                + ImGuiWindowFlags.NoCollapse + ImGuiWindowFlags.NoTitleBar);
+                + ImGuiWindowFlags.NoCollapse + ImGuiWindowFlags.NoTitleBar + ImGuiWindowFlags.NoSavedSettings);
+
+        ImGui.setWindowSize(297,770); // Hardcode window size.
+        ImGui.setWindowPos(728,0); // Hardcode window pos. This way it'll be the same on every computer.
 
         ImGui.beginChild("masterAudioSettings",0,80,true);
         TextTools.CenterText("MASTER AUDIO SETTINGS");

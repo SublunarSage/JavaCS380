@@ -18,6 +18,10 @@ import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
+
+    private final int WIDTH = 1024;
+    private final int HEIGHT = 768;
+
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
@@ -67,7 +71,8 @@ public class Window {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        windowPtr = glfwCreateWindow(1024, 768, "JOSC", NULL, NULL);
+        windowPtr = glfwCreateWindow(WIDTH, HEIGHT, "JOSC", NULL, NULL);
+
 
         if (windowPtr == NULL) {
             System.out.println("Unable to create window");
@@ -79,6 +84,7 @@ public class Window {
         glfwShowWindow(windowPtr);
 
         GL.createCapabilities();
+        glfwSetWindowSizeLimits(windowPtr, WIDTH, HEIGHT, WIDTH, HEIGHT);
 
     }
 
@@ -100,12 +106,17 @@ public class Window {
             dummyVar += .001;
             if(dummyVar > 1) dummyVar = 0;
 
-
             // ImGui render frame begins here
             imGuiGlfw.newFrame();
             ImGui.newFrame();
 
+
+            // Insert GUI windows below ------
             imguiLayer.imgui();
+
+
+
+            // Insert GUI windows above ------
 
             ImGui.render();
             imGuiGl3.renderDrawData(ImGui.getDrawData());

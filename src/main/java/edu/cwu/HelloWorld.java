@@ -95,11 +95,16 @@ public class HelloWorld {
         // Set the clear color
         glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 
+
+
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while( !glfwWindowShouldClose(window) ) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the framebuffer
-
+            glBegin(GL_LINE_STRIP);
+            glVertex2f(0, 0);
+            glVertex2f(1, -1);
+            glEnd();
             glfwSwapBuffers(window); // Swap the color buffers
 
             // Poll for the window events. The key callback above will only be invoked during this call.

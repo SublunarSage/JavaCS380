@@ -7,6 +7,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
+import java.util.Random;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -100,10 +101,22 @@ public class HelloWorld {
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while( !glfwWindowShouldClose(window) ) {
+            // set of coordinate points to choose from
+            int[] arr = {-1, 1};
+            Random r = new Random();
+            int randomIndex = r.nextInt(arr.length);
+            int randomValX = arr[randomIndex];
+            randomIndex = r.nextInt(arr.length);
+            int randomValY = arr[randomIndex];
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the framebuffer
+            // line starts
             glBegin(GL_LINE_STRIP);
+            // line starting point
             glVertex2f(0, 0);
-            glVertex2f(1, -1);
+            // line ending point
+            glVertex2f(randomValX, randomValY);
+            // end the line
             glEnd();
             glfwSwapBuffers(window); // Swap the color buffers
 

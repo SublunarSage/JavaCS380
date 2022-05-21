@@ -101,23 +101,29 @@ public class HelloWorld {
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while( !glfwWindowShouldClose(window) ) {
-            // set of coordinate points to choose from
-            int[] arr = {-1, 1};
-            Random r = new Random();
-            int randomIndex = r.nextInt(arr.length);
-            int randomValX = arr[randomIndex];
-            randomIndex = r.nextInt(arr.length);
-            int randomValY = arr[randomIndex];
+
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the framebuffer
-            // line starts
-            glBegin(GL_LINE_STRIP);
-            // line starting point
+            int x = 0;
+            int y = 0;
+            Random rand = new Random();
+            float radius = rand.nextFloat();
+            int NUM_PIZZA_SLICES = 100;
+            int SUBDIVISIONS = 100;
+            glPushMatrix();
+            glTranslatef(x, y, 0);
+            glScalef(radius, radius, 1);
+
+            glBegin(GL11.GL_TRIANGLE_FAN);
             glVertex2f(0, 0);
-            // line ending point
-            glVertex2f(randomValX, randomValY);
-            // end the line
+            for(int i = 0; i <= NUM_PIZZA_SLICES; i++){ //NUM_PIZZA_SLICES decides how round the circle looks.
+                double angle = Math.PI * 2 * i / SUBDIVISIONS;
+                glVertex2f((float)Math.cos(angle), (float)Math.sin(angle));
+            }
             glEnd();
+
+            glPopMatrix();
+
             glfwSwapBuffers(window); // Swap the color buffers
 
             // Poll for the window events. The key callback above will only be invoked during this call.

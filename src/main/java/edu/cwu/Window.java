@@ -26,7 +26,7 @@ public class Window {
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
     private String glslVersion = null;
-    private long windowPtr;
+    private long windowPtr; // Java does not have native pointers, so the long datatype is used.
     private final ImGuiLayer imguiLayer;
 
     private double dummyVar = 0;
@@ -103,8 +103,13 @@ public class Window {
             glClearColor(0.3f - dumbSine, dumbSine, 0.3f + dumbSine, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
+            // Put custom OpenGL Code below -----
             dummyVar += .001;
             if(dummyVar > 1) dummyVar = 0;
+
+
+
+            // Put custom OpenGl Code above -----
 
             // ImGui render frame begins here
             imGuiGlfw.newFrame();
@@ -113,7 +118,6 @@ public class Window {
 
             // Insert GUI windows below ------
             imguiLayer.imgui();
-
 
 
             // Insert GUI windows above ------

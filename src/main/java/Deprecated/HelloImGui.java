@@ -1,4 +1,4 @@
-package edu.cwu;
+package Deprecated;
 import imgui.ImGui;
 import imgui.app.Application; // High level abstraction layer
 import imgui.app.Configuration;

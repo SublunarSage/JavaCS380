@@ -1,4 +1,4 @@
-package edu.cwu;
+package Deprecated;
 
 
 import org.lwjgl.*;

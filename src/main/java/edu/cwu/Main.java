@@ -5,11 +5,11 @@ import imgui.app.Application;
 
 public class Main {
     public static void main(String[] args) {
-        //System.out.println("Hello world!");
-        //new HelloWorld().run();
-        //Application.launch(new HelloImGui());
+        MasterAudioSettings masterAudioSettings = new MasterAudioSettings();
+        ImGuiLayer imGuiLayer = new ImGuiLayer();
+        imGuiLayer.setMasterAudioSettings(masterAudioSettings);
 
-        Window window = new Window(new ImGuiLayer());
+        Window window = new Window(imGuiLayer);
         window.init();
         window.run();
         window.destroy();

@@ -43,8 +43,8 @@ public class ImGuiLayer {
 
 
         // ----
-        if(ImGui.button("+", -1,20)) // Implement functionality relating to adding sounds to the audioGenerator Window
-        {
+        // Implement functionality relating to adding sounds to the audioGenerator Window
+        if(ImGui.button("+", -1,20)) {
 
 
         }

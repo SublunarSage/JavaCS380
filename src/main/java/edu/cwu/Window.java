@@ -1,6 +1,5 @@
 package edu.cwu;
 
-import edu.cwu.tools.Time;
 import imgui.ImGui;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
@@ -109,8 +108,9 @@ public class Window {
     public void run() {
         SCWave.init();
 
-        float beginTime = Time.getTime();
-        float endTime = Time.getTime();
+        float beginTime = (float)glfwGetTime(); // Use LWJGL's built in timer.
+        float endTime;
+        float dt = -1;
 
         while (!glfwWindowShouldClose(windowPtr)) {
             float dumbSine = .2f * (float) Math.sin(2 * Math.PI * dummyVar) + .3f;
@@ -121,8 +121,11 @@ public class Window {
             glClear(GL_COLOR_BUFFER_BIT);
 
             // Put custom OpenGL Code below -----
-            dummyVar += .001;
-            if(dummyVar > 1) dummyVar = 0;
+            if(dt >= 0) {
+                dummyVar += dt/6;
+                if(dummyVar > 6) dummyVar = 0;
+            }
+
 
             SCWave.draw();
             // Put custom OpenGl Code above -----
@@ -153,8 +156,8 @@ public class Window {
             GLFW.glfwPollEvents();
 
             // Time management
-            endTime = Time.getTime();
-            float dt = endTime - beginTime;
+            endTime = (float)glfwGetTime();
+            dt = endTime - beginTime;
             beginTime = endTime;
         }
     }

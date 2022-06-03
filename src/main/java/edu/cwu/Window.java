@@ -1,5 +1,6 @@
 package edu.cwu;
 
+import edu.cwu.renderer.Renderer;
 import imgui.ImGui;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
@@ -16,6 +17,7 @@ public class Window {
 
     private final int WIDTH = 1024;
     private final int HEIGHT = 768;
+    private final int VIEWPORT_WIDTH = 728;
 
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
@@ -26,7 +28,20 @@ public class Window {
 
     private double dummyVar = 0;
 
-    private SingleChannelWave SCWave = new SingleChannelWave();
+    private TestShaderClass TSClass = new TestShaderClass();
+    private Renderer renderer = new Renderer(VIEWPORT_WIDTH/2);
+    private boolean shouldGenerate = true;
+    private int wavePos = 0;
+
+    short[] audioBuffer = new short[AudioThread.BUFFER_SIZE];
+    float audioFreq = 110;
+    public AudioThread audioThread = new AudioThread(() -> {
+        if(!shouldGenerate) return null;
+        for(int i = 0; i < AudioThread.BUFFER_SIZE; ++i) {
+            audioBuffer[i] = (short) (Short.MAX_VALUE * Math.sin((2*Math.PI*audioFreq)/AudioThread.SAMPLE_RATE * wavePos++));
+        }
+        return audioBuffer;
+    });
 
 
     public Window(ImGuiLayer layer) {
@@ -39,15 +54,18 @@ public class Window {
         initImGui();
         imGuiGlfw.init(windowPtr, true);
         imGuiGl3.init(glslVersion);
+
     }
 
     public void destroy() {
+        audioThread.close();
         imGuiGl3.dispose();
         imGuiGlfw.dispose();
         ImGui.destroyContext();
         Callbacks.glfwFreeCallbacks(windowPtr);
         glfwDestroyWindow(windowPtr);
         glfwTerminate();
+
 
     }
 
@@ -106,28 +124,51 @@ public class Window {
     }
 
     public void run() {
-        SCWave.init();
+        //TSClass.init();
+
 
         float beginTime = (float)glfwGetTime(); // Use LWJGL's built in timer.
         float endTime;
         float dt = -1;
+
 
         while (!glfwWindowShouldClose(windowPtr)) {
             float dumbSine = .2f * (float) Math.sin(2 * Math.PI * dummyVar) + .3f;
             float dumbCos = .2f * (float) Math.cos(2 * Math.PI * dummyVar) + .3f;
             float dumberSine = .2f * (float) Math.sin(3 * Math.PI * dummyVar) + .3f;
 
-            glClearColor(0.2f + dumbCos, 0.2f + dumberSine, 0.2f + dumbSine, 1.0f);
+            glClearColor(dumbCos, dumberSine, dumbSine, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
+
+            if(!audioThread.isRunning()) audioThread.triggerPlayback();
 
             // Put custom OpenGL Code below -----
             if(dt >= 0) {
-                dummyVar += dt/6;
+                //dummyVar += dt/6;
                 if(dummyVar > 6) dummyVar = 0;
+                renderer.render();
+                //TSClass.draw(dt);
+
+                float[] normalizedBuffer = new float[audioBuffer.length];
+
+                for(int i = 0; i < normalizedBuffer.length; i++) {
+                    normalizedBuffer[i] = (float) audioBuffer[i] / Short.MAX_VALUE;
+                }
+
+                float[] testFloat = new float[audioBuffer.length];
+
+                for(int i = 0; i < testFloat.length-1; i+=2) {
+                    float x = (float) (i * 2 - audioBuffer.length)/ audioBuffer.length;
+                    testFloat[i] = x;
+                    testFloat[i+1] = (float) normalizedBuffer[i];
+                }
+
+                renderer.set(testFloat);
+
             }
 
 
-            SCWave.draw();
+
             // Put custom OpenGl Code above -----
 
             // ImGui render frame begins here

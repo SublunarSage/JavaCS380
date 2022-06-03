@@ -1,5 +1,9 @@
 package edu.cwu.renderer;
 
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,6 +13,7 @@ import static org.lwjgl.opengl.GL30.*;
 public class Shader {
 
     private int shaderProgramId, vertexID, fragmentID;
+    private boolean active;
 
     private String vertexSource;
     private String fragmentSource;
@@ -115,15 +120,50 @@ public class Shader {
     }
 
     public void bind() {
-        glUseProgram(shaderProgramId);
+        if(!active) {
+            glUseProgram(shaderProgramId);
+            active = true;
+        }
+
     }
 
     public void unbind() {
         glUseProgram(0);
+        active = false;
     }
 
     public void destroy() {
         unbind();
         if(shaderProgramId != 0) glDeleteProgram(shaderProgramId);
+    }
+
+    public void uploadVec4f(String varName, Vector4f vec) {
+        int varLocation = glGetUniformLocation(shaderProgramId, varName);
+        bind();
+        glUniform4f(varLocation, vec.x, vec.y, vec.z, vec.w);
+    }
+
+    public void uploadVec3f(String varName, Vector3f vec) {
+        int varLocation = glGetUniformLocation(shaderProgramId, varName);
+        bind();
+        glUniform3f(varLocation, vec.x, vec.y, vec.z);
+    }
+
+    public void uploadVec2f(String varName, Vector2f vec) {
+        int varLocation = glGetUniformLocation(shaderProgramId, varName);
+        bind();
+        glUniform2f(varLocation, vec.x, vec.y);
+    }
+
+    public void uploadFloat(String varName, float val) {
+        int varLocation = glGetUniformLocation(shaderProgramId, varName);
+        bind();
+        glUniform1f(varLocation,val);
+    }
+
+    public void uploadInt(String varName, int val) {
+        int varLocation = glGetUniformLocation(shaderProgramId, varName);
+        bind();
+        glUniform1i(varLocation,val);
     }
 }

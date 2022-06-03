@@ -16,7 +16,9 @@ void main() {
 in vec4 fColor;
 
 out vec4 color;
+uniform vec4 oColor;
 
 void main() {
-    color = fColor;
+    color = vec4(fColor.xy,oColor.x,fColor.w);
+
 }

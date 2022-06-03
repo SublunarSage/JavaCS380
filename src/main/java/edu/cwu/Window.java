@@ -1,26 +1,23 @@
 package edu.cwu;
 
+import edu.cwu.renderer.Renderer;
 import imgui.ImGui;
-import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 
-import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
 
-import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
 
     private final int WIDTH = 1024;
     private final int HEIGHT = 768;
+    private final int VIEWPORT_WIDTH = 728;
 
     private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
@@ -30,6 +27,21 @@ public class Window {
     private final ImGuiLayer imguiLayer;
 
     private double dummyVar = 0;
+
+    private TestShaderClass TSClass = new TestShaderClass();
+    private Renderer renderer = new Renderer(VIEWPORT_WIDTH/2);
+    private boolean shouldGenerate = true;
+    private int wavePos = 0;
+
+    short[] audioBuffer = new short[AudioThread.BUFFER_SIZE];
+    float audioFreq = 110;
+    public AudioThread audioThread = new AudioThread(() -> {
+        if(!shouldGenerate) return null;
+        for(int i = 0; i < AudioThread.BUFFER_SIZE; ++i) {
+            audioBuffer[i] = (short) (Short.MAX_VALUE * Math.sin((2*Math.PI*audioFreq)/AudioThread.SAMPLE_RATE * wavePos++));
+        }
+        return audioBuffer;
+    });
 
 
     public Window(ImGuiLayer layer) {
@@ -42,15 +54,18 @@ public class Window {
         initImGui();
         imGuiGlfw.init(windowPtr, true);
         imGuiGl3.init(glslVersion);
+
     }
 
     public void destroy() {
+        audioThread.close();
         imGuiGl3.dispose();
         imGuiGlfw.dispose();
         ImGui.destroyContext();
         Callbacks.glfwFreeCallbacks(windowPtr);
         glfwDestroyWindow(windowPtr);
         glfwTerminate();
+
 
     }
 
@@ -66,25 +81,37 @@ public class Window {
             System.exit(-1);
         }
 
-        glslVersion = "#version 130";
+        // Configure GLFW
+        glslVersion = "#version 330";
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+
+        // Create the Window
         windowPtr = glfwCreateWindow(WIDTH, HEIGHT, "JOSC", NULL, NULL);
 
-
         if (windowPtr == NULL) {
-            System.out.println("Unable to create window");
-            System.exit(-1);
+            throw new IllegalStateException("Failed to create the GLFW window");
         }
 
+        // Make the OpenGL context current
         glfwMakeContextCurrent(windowPtr);
+        // Enable V-Sync
         glfwSwapInterval(1);
+
+        // Make the window visible
         glfwShowWindow(windowPtr);
 
+        // This line is critical for LWJGL's interoperation with GLFW's OpenGL context,
+        // or any context that is managed externally. LWJGL detects the context that is current in the current
+        // thread, creates the GLCapabilities instance and makes the OpenGL bindings available for use.
         GL.createCapabilities();
-        glfwSetWindowSizeLimits(windowPtr, WIDTH, HEIGHT, WIDTH, HEIGHT);
+
+        glViewport(0,0,728,HEIGHT); // Where openGL will draw pixels. Conversion from normalized to pixels.
+
 
     }
 
@@ -97,15 +124,48 @@ public class Window {
     }
 
     public void run() {
+        //TSClass.init();
+
+
+        float beginTime = (float)glfwGetTime(); // Use LWJGL's built in timer.
+        float endTime;
+        float dt = -1;
+
+
         while (!glfwWindowShouldClose(windowPtr)) {
             float dumbSine = .2f * (float) Math.sin(2 * Math.PI * dummyVar) + .3f;
+            float dumbCos = .2f * (float) Math.cos(2 * Math.PI * dummyVar) + .3f;
+            float dumberSine = .2f * (float) Math.sin(3 * Math.PI * dummyVar) + .3f;
 
-            glClearColor(0.3f - dumbSine, dumbSine, 0.3f + dumbSine, 1.0f);
+            glClearColor(dumbCos, dumberSine, dumbSine, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
+            if(!audioThread.isRunning()) audioThread.triggerPlayback();
+
             // Put custom OpenGL Code below -----
-            dummyVar += .001;
-            if(dummyVar > 1) dummyVar = 0;
+            if(dt >= 0) {
+                //dummyVar += dt/6;
+                if(dummyVar > 6) dummyVar = 0;
+                renderer.render();
+                //TSClass.draw(dt);
+
+                float[] normalizedBuffer = new float[audioBuffer.length];
+
+                for(int i = 0; i < normalizedBuffer.length; i++) {
+                    normalizedBuffer[i] = (float) audioBuffer[i] / Short.MAX_VALUE;
+                }
+
+                float[] testFloat = new float[audioBuffer.length];
+
+                for(int i = 0; i < testFloat.length-1; i+=2) {
+                    float x = (float) (i * 2 - audioBuffer.length)/ audioBuffer.length;
+                    testFloat[i] = x;
+                    testFloat[i+1] = (float) normalizedBuffer[i];
+                }
+
+                renderer.set(testFloat);
+
+            }
 
 
 
@@ -135,6 +195,11 @@ public class Window {
 
             GLFW.glfwSwapBuffers(windowPtr);
             GLFW.glfwPollEvents();
+
+            // Time management
+            endTime = (float)glfwGetTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
         }
     }
 }

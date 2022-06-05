@@ -10,11 +10,14 @@ public class ImGuiLayer {
     private boolean showText = false;
     private int dummy = 0;
     MasterAudioSettings masterAudioSettings;
+    AudioController masterAudioController;
+    OscillatorSimpleSine testSine;
 
-
-    public void setMasterAudioSettings(MasterAudioSettings settings)
-    {
-        masterAudioSettings = settings;
+    public ImGuiLayer(AudioController mac) {
+        masterAudioController = mac;
+        masterAudioSettings = (MasterAudioSettings) masterAudioController.getAudioSettings();
+        testSine = (OscillatorSimpleSine) masterAudioController.getOscillators();
+        //testSine = new OscillatorSimpleSine(masterAudioController);
     }
 
     // ImGui layers always have a beginning and ending, as it's basically functioning in a 'stack' like context
@@ -39,15 +42,17 @@ public class ImGuiLayer {
         // All sound module GUIs should go down here. A sound module is something that generates sound and can be
         // controlled via a small GUI.
 
-
+        testSine.invokeGUI(true);
+        testSine.GUI();
+        //testSine.update(); // This function causes the crackling. I think.
 
 
         // ----
         // Implement functionality relating to adding sounds to the audioGenerator Window
-        if(ImGui.button("+", -1,20)) {
+        //if(ImGui.button("+", -1,20)) {
 
 
-        }
+        //}
         ImGui.popStyleVar();
         ImGui.endChild();
 

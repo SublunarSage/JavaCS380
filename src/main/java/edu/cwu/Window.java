@@ -32,21 +32,15 @@ public class Window {
     private Renderer renderer = new Renderer(VIEWPORT_WIDTH/2);
     private boolean shouldGenerate = true;
     private int wavePos = 0;
-
-    short[] audioBuffer = new short[AudioThread.BUFFER_SIZE];
-    float audioFreq = 110;
-    public AudioThread audioThread = new AudioThread(() -> {
-        if(!shouldGenerate) return null;
-        for(int i = 0; i < AudioThread.BUFFER_SIZE; ++i) {
-            audioBuffer[i] = (short) (Short.MAX_VALUE * Math.sin((2*Math.PI*audioFreq)/AudioThread.SAMPLE_RATE * wavePos++));
-        }
-        return audioBuffer;
-    });
+    private AudioBuffer audioBuffer;
+    private AudioController audioController;
 
 
-    public Window(ImGuiLayer layer) {
+
+    public Window(ImGuiLayer layer, AudioController audio) {
         imguiLayer = layer;
-
+        audioController = audio;
+        audioBuffer = audioController.getAudioBuffer();
     }
 
     public void init() {
@@ -58,7 +52,7 @@ public class Window {
     }
 
     public void destroy() {
-        audioThread.close();
+        audioController.closeThread();
         imGuiGl3.dispose();
         imGuiGlfw.dispose();
         ImGui.destroyContext();
@@ -140,7 +134,7 @@ public class Window {
             glClearColor(dumbCos, dumberSine, dumbSine, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            if(!audioThread.isRunning()) audioThread.triggerPlayback();
+            //if(!audioThread.isRunning()) audioThread.triggerPlayback();
 
             // Put custom OpenGL Code below -----
             if(dt >= 0) {
@@ -149,16 +143,17 @@ public class Window {
                 renderer.render();
                 //TSClass.draw(dt);
 
-                float[] normalizedBuffer = new float[audioBuffer.length];
+
+                float[] normalizedBuffer = new float[audioBuffer.getAudioBuffer().length];
 
                 for(int i = 0; i < normalizedBuffer.length; i++) {
-                    normalizedBuffer[i] = (float) audioBuffer[i] / Short.MAX_VALUE;
+                    normalizedBuffer[i] = (float) audioBuffer.getAudioBuffer()[i] / Short.MAX_VALUE;
                 }
 
-                float[] testFloat = new float[audioBuffer.length];
+                float[] testFloat = new float[audioBuffer.getAudioBuffer().length];
 
                 for(int i = 0; i < testFloat.length-1; i+=2) {
-                    float x = (float) (i * 2 - audioBuffer.length)/ audioBuffer.length;
+                    float x = (float) (i * 2 - audioBuffer.getAudioBuffer().length)/ audioBuffer.getAudioBuffer().length;
                     testFloat[i] = x;
                     testFloat[i+1] = (float) normalizedBuffer[i];
                 }

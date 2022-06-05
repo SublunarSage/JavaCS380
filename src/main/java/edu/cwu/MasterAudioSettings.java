@@ -24,6 +24,7 @@ public class MasterAudioSettings extends AudioSettings {
             ImGui.pushStyleVar(ImGuiStyleVar.FramePadding,0,0);
             if(ImGui.sliderFloat("##masterVolume",masterVolume,0,100, "%.2f")) {
                 masterVolume[0] = Math.round(masterVolume[0]/step) * step;
+                amplitude = masterVolume[0];
             }
             ImGui.popStyleVar();
             //-----
@@ -34,7 +35,7 @@ public class MasterAudioSettings extends AudioSettings {
 
             ImGui.pushStyleVar(ImGuiStyleVar.FramePadding,0,0);
             if(ImGui.sliderInt("##masterSampleRate",masterSampleRate,2000,44100)) {
-
+                sampleRate = masterSampleRate[0];
             }
             ImGui.popStyleVar();
 

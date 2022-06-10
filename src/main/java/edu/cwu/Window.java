@@ -6,6 +6,7 @@ import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 
+import org.joml.Vector4f;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
@@ -131,8 +132,10 @@ public class Window {
             float dumbCos = .2f * (float) Math.cos(2 * Math.PI * dummyVar) + .3f;
             float dumberSine = .2f * (float) Math.sin(3 * Math.PI * dummyVar) + .3f;
 
-            glClearColor(dumbCos, dumberSine, dumbSine, 1.0f);
+            glClearColor(audioController.getCurrentColor().x, audioController.getCurrentColor().y, audioController.getCurrentColor().z, audioController.getCurrentColor().w);
             glClear(GL_COLOR_BUFFER_BIT);
+
+
 
             //if(!audioThread.isRunning()) audioThread.triggerPlayback();
 

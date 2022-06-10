@@ -1,5 +1,7 @@
 package edu.cwu;
 
+import org.joml.Vector4f;
+
 public class AudioController {
     private boolean shouldGenerate;
     private final int MAX_SAFE_VOLUME = 150;
@@ -34,6 +36,21 @@ public class AudioController {
         if(masterAudioThread.isRunning()) {
             shouldGenerate = false;
         }
+
     }
 
+    private Vector4f colorA = new Vector4f(0.1f,0.2f,0.3f, 1);
+    private Vector4f colorB = new Vector4f(0.1f, 0.2f, 0.3f, 1);
+    private Vector4f currentColor = colorA;
+
+    public Vector4f getCurrentColor() {
+        return currentColor;
+    }
+
+    public void setToColorA() {
+        currentColor = colorA;
+    }
+    public void  setToColorB(){
+        currentColor = colorB;
+    }
 }

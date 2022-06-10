@@ -49,10 +49,7 @@ public class ImGuiLayer {
 
         // ----
         // Implement functionality relating to adding sounds to the audioGenerator Window
-        //if(ImGui.button("+", -1,20)) {
 
-
-        //}
         ImGui.popStyleVar();
         ImGui.endChild();
 
@@ -61,11 +58,19 @@ public class ImGuiLayer {
         TextTools.CenterText("VIDEO SETTINGS");
         // All functionality relating to configuring the graphical portion of the Oscilloscope goes here
         // (2 channel Osc, 1 channel Osc, etc).
+        if(ImGui.button("Change to A", -1,20)) {
+            masterAudioController.setToColorA();
 
+        }
+        if(ImGui.button("Change to B", -1,20)) {
+            masterAudioController.setToColorB();
+
+        }
 
         // ----
         ImGui.endChild();
 
         ImGui.end();
     }
+
 }

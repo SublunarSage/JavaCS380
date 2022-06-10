@@ -58,5 +58,8 @@ tasks.getByName<Test>("test") {
 
 application {
     mainClass.set("edu.cwu.Main")
-    applicationDefaultJvmArgs = listOf("-XstartOnFirstThread")
+    if(System.getProperty("os.name").toLowerCase().contains("mac"))
+    {
+        applicationDefaultJvmArgs = listOf("-XstartOnFirstThread")
+    }
 }
